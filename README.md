@@ -1,23 +1,16 @@
 
-Quatrefoil Workflow
+Play Lorenz Attractor
 ----
 
 > Based on [Quatrefoil](https://github.com/Quamolit/quatrefoil.calcit).
 
-Demo http://repo.quamolit.org/quatrefoil-workflow/
+Live demo http://repo.quamolit.org/play-lorenz-attractor/
 
-### Develop
+Video demo https://www.bilibili.com/video/BV1Uw411d79p
 
-Relies on https://github.com/calcit-lang/calcit_runner.rs .
+### Workflow
 
-```bash
-yarn
-
-# also get calcit deps into `~/.config/calcit/modules/`
-
-cr --emit-js -1
-yarn vite
-```
+https://github.com/Quamolit/quatrefoil-workflow
 
 ### License
 
