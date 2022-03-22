@@ -1,8 +1,9 @@
 
 {} (:package |app)
   :configs $ {} (:init-fn |app.main/main!) (:reload-fn |app.main/reload!)
-    :modules $ [] |touch-control/ |pointed-prompt/ |quatrefoil.calcit/
+    :modules $ [] |touch-control/ |pointed-prompt/ |quatrefoil/
     :version |0.0.4
+  :entries $ {}
   :files $ {}
     |app.comp.container $ {}
       :ns $ quote
@@ -42,7 +43,7 @@
     |app.main $ {}
       :ns $ quote
         ns app.main $ :require
-          "\"@quamolit/quatrefoil-utils" :refer $ inject-tree-methods
+          "\"@quatrefoil/utils" :refer $ inject-tree-methods
           quatrefoil.core :refer $ render-canvas! *global-tree clear-cache! init-renderer! handle-key-event handle-control-events
           app.comp.container :refer $ comp-container
           app.updater :refer $ [] updater
@@ -92,9 +93,9 @@
       :ns $ quote
         ns app.comp.lorenz-attractor $ :require
           quatrefoil.alias :refer $ group box sphere text line tube point-light ambient-light
-          quatrefoil.core :refer $ defcomp
+          quatrefoil.core :refer $ defcomp hclx
           quatrefoil.math :refer $ q* &q* v-scale q+ invert
-          quatrefoil.comp.control :refer $ comp-control comp-toggle
+          quatrefoil.comp.control :refer $ comp-control comp-toggle comp-value
           quatrefoil.app.materials :refer $ cover-line
       :defs $ {}
         |initial-config $ quote
@@ -110,7 +111,7 @@
                 state $ or (:data states)
                   {} (:a 10) (:b 28)
                     :c $ / 8 3
-                    :size 3000
+                    :size 6000
                     :unit 0.006
                     :scale 4
                 a $ :a state
@@ -120,29 +121,70 @@
                 unit $ :unit state
                 scale $ :scale state
               group ({})
-                line $ {}
-                  :points $ gen-lorenz-seq (.round size) unit a b c scale
-                  :position $ [] 0 0 0
-                  :material $ {} (:kind :line-basic) (:color 0xffdd00) (:opacity 1) (:transparent true) (:linewidth 1) (:gapSize 0.5) (:dashSize 0.5)
+                let
+                    n 8
+                    points $ gen-lorenz-seq (.round size) unit a b c scale
+                    segments $ split-segments points 3
+                  group ({}) & $ -> segments
+                    map-indexed $ fn (idx segment)
+                      line $ {} (:points segment)
+                        :position $ [] 0 0 0
+                        :material $ {} (:kind :line-basic)
+                          :color $ hclx
+                            * 360 $ / idx (count segments)
+                            , 100 50
+                          :opacity 1
+                          ; :transparent true
+                          :linewidth 1
                 group ({})
-                  comp-control state cursor :size ([] 10 10 160) 100 ([] 10 80000) 0xffff55
-                  comp-control state cursor :unit ([] 15 10 160) 0.0001 ([] 0.00001 1) 0xffff55
-                  comp-control state cursor :scale ([] 20 10 160) 0.1 ([] 0.1 10) 0xec8afa
-                  comp-control state cursor :a ([] 20 4 160) 0.5 ([] -100 100) 0xaaaaff
-                  comp-control state cursor :b ([] 26 4 160) 0.5 ([] -100 100) 0xaaaaff
-                  comp-control state cursor :c ([] 32 4 160) 0.5 ([] -100 100) 0xaaaaff
+                  comp-value
+                    {} (:radius 1) (:speed 400) (:color 0xffff55) (:show-text? true) (:opacity 0.8) (:label |size) (:fract-length 0)
+                      :value $ :size state
+                      :position $ [] 10 20 160
+                      :bound $ [] 10 300000
+                    fn (v d!)
+                      d! cursor $ assoc state :size v
+                  comp-value
+                    {} (:radius 1) (:speed 0.0001) (:color 0xffaa99) (:show-text? true) (:opacity 0.8) (:label |unit) (:fract-length 5)
+                      :value $ :unit state
+                      :position $ [] 10 15 160
+                      :bound $ [] 0.00001 1
+                    fn (v d!)
+                      d! cursor $ assoc state :unit v
+                  comp-value
+                    {} (:radius 1) (:speed 0.1) (:color 0xec8afa) (:show-text? true) (:opacity 0.8) (:label |scale) (:fract-length 5)
+                      :value $ :scale state
+                      :position $ [] 10 10 160
+                      :bound $ [] 0.1 10
+                    fn (v d!)
+                      d! cursor $ assoc state :scale v
+                  comp-value
+                    {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |a) (:fract-length 5)
+                      :value $ :a state
+                      :position $ [] 20 5 160
+                      :bound $ [] -100 100
+                    fn (v d!)
+                      d! cursor $ assoc state :a v
+                  comp-value
+                    {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |b) (:fract-length 5)
+                      :value $ :b state
+                      :position $ [] 20 0 160
+                      :bound $ [] -100 100
+                    fn (v d!)
+                      d! cursor $ assoc state :ab v
+                  comp-value
+                    {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |c) (:fract-length 5)
+                      :value $ :c state
+                      :position $ [] 20 -5 160
+                      :bound $ [] -100 100
+                    fn (v d!)
+                      d! cursor $ assoc state :c v
                   sphere $ {} (:radius 1) (:emissive 0xffffff) (:color 0xff0000) (:emissiveIntensity 1)
                     :position $ [] 50 4 160
                     :material $ {} (:kind :mesh-basic) (:color 0xff0000) (:opacity 1) (:transparent true)
                     :event $ {}
                       :click $ fn (e d!)
                         d! cursor $ merge state initial-config
-                text $ {}
-                  :text $ str (.format a 3) &newline (.format b 3) &newline (.format c 3)
-                  :size 2
-                  :height 1
-                  :position $ [] 30 0 150
-                  :material $ {} (:kind :mesh-lambert) (:color 0x555544)
                 ambient-light $ {} (:color 0x444422)
                 point-light $ {} (:color 0xffffff) (:intensity 2) (:distance 200)
                   :position $ [] 0 60 0
@@ -152,18 +194,30 @@
                 []
                 , 2 3 4 steps
               fn (acc x y z n) (; println "\"trace" x y z n)
-                if (<= n 0) acc $ let
-                    dx $ * dt
-                      * a $ - y x
-                    dy $ * dt
-                      -
-                        * x $ - b z
+                if (&<= n 0) acc $ let
+                    dx $ &* dt
+                      &* a $ &- y x
+                    dy $ &* dt
+                      &-
+                        &* x $ &- b z
                         , y
-                    dz $ * dt
-                      - (* x y) (* c z)
+                    dz $ &* dt
+                      &- (&* x y) (&* c z)
                   recur
                     conj acc $ v-scale ([] x y z) scale
-                    + x dx
-                    + y dy
-                    + z dz
+                    &+ x dx
+                    &+ y dy
+                    &+ z dz
                     dec n
+        |split-segments $ quote
+          defn split-segments (points n)
+            let
+                size $ count points
+                unit $ js/Math.floor (/ size n)
+              -> (range n)
+                map $ fn (idx)
+                  if
+                    = (inc idx) size
+                    slice points (* idx unit) size
+                    slice points (* idx unit)
+                      * (inc idx) unit
