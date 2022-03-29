@@ -8,7 +8,7 @@
     |app.comp.container $ {}
       :ns $ quote
         ns app.comp.container $ :require
-          quatrefoil.alias :refer $ group box sphere point-light ambient-light perspective-camera scene text
+          quatrefoil.alias :refer $ group box sphere point-light ambient-light scene text
           quatrefoil.core :refer $ defcomp >>
           app.como.lorenz-attractor :refer $ comp-lorenz-attractor
       :defs $ {}
@@ -21,11 +21,6 @@
                   {} $ :tab :portal
                 tab $ :tab state
               scene ({})
-                perspective-camera $ {} (:fov 45)
-                  :aspect $ / js/window.innerWidth js/window.innerHeight
-                  :near 0.1
-                  :far 1000
-                  :position $ [] 0 0 100
                 comp-lorenz-attractor $ >> states :lorenz
                 ambient-light $ {} (:color 0x666666)
                 ; point-light $ {} (:color 0xffffff) (:intensity 1.4) (:distance 200)
@@ -52,12 +47,16 @@
           "\"mobile-detect" :default mobile-detect
           "\"bottom-tip" :default hud!
           "\"./calcit.build-errors" :default build-errors
+          quatrefoil.dsl.object3d-dom :refer $ set-perspective-camera!
       :defs $ {}
         |render-app! $ quote
           defn render-app! () (; println "|Render app:")
             render-canvas! (comp-container @*store) dispatch!
         |main! $ quote
           defn main! () (load-console-formatter!) (inject-tree-methods)
+            set-perspective-camera! $ {} (:fov 45) (:near 0.1) (:far 1000)
+              :position $ [] 0 0 100
+              :aspect $ / js/window.innerWidth js/window.innerHeight
             let
                 canvas-el $ js/document.querySelector |canvas
               init-renderer! canvas-el $ {} (:background 0x110022)
@@ -93,7 +92,7 @@
       :ns $ quote
         ns app.comp.lorenz-attractor $ :require
           quatrefoil.alias :refer $ group box sphere text line tube point-light ambient-light
-          quatrefoil.core :refer $ defcomp hclx
+          quatrefoil.core :refer $ defcomp hclx hslx
           quatrefoil.math :refer $ q* &q* v-scale q+ invert
           quatrefoil.comp.control :refer $ comp-control comp-toggle comp-value
           quatrefoil.app.materials :refer $ cover-line
@@ -109,11 +108,8 @@
             let
                 cursor $ :cursor states
                 state $ or (:data states)
-                  {} (:a 10) (:b 28)
+                  {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
                     :c $ / 8 3
-                    :size 6000
-                    :unit 0.006
-                    :scale 4
                 a $ :a state
                 b $ :b state
                 c $ :c state
@@ -124,24 +120,22 @@
                 let
                     n 8
                     points $ gen-lorenz-seq (.round size) unit a b c scale
-                    segments $ split-segments points 3
+                    segments $ split-segments points 2
                   group ({}) & $ -> segments
                     map-indexed $ fn (idx segment)
                       line $ {} (:points segment)
                         :position $ [] 0 0 0
                         :material $ {} (:kind :line-basic)
-                          :color $ hclx
-                            * 360 $ / idx (count segments)
-                            , 100 50
+                          :color $ or (nth color-scheme idx) 0xffffff
                           :opacity 1
                           ; :transparent true
                           :linewidth 1
                 group ({})
                   comp-value
-                    {} (:radius 1) (:speed 400) (:color 0xffff55) (:show-text? true) (:opacity 0.8) (:label |size) (:fract-length 0)
+                    {} (:radius 1) (:speed 600) (:color 0xffff55) (:show-text? true) (:opacity 0.8) (:label |size) (:fract-length 0)
                       :value $ :size state
                       :position $ [] 10 20 160
-                      :bound $ [] 10 300000
+                      :bound $ [] 10 800000
                     fn (v d!)
                       d! cursor $ assoc state :size v
                   comp-value
@@ -221,3 +215,5 @@
                     slice points (* idx unit) size
                     slice points (* idx unit)
                       * (inc idx) unit
+        |color-scheme $ quote
+          def color-scheme $ [] (hslx 240 100 60) (hslx 30 100 50)

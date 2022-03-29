@@ -27,7 +27,7 @@ jobs:
       run: >
         mkdir -p ~/.config/calcit/modules/ && cd ~/.config/calcit/modules/
         && git clone https://github.com/Quamolit/touch-control.git
-        && git clone https://github.com/Quatrefoil-GL/quatrefoil.git --branch=0.0.18
+        && git clone https://github.com/Quatrefoil-GL/quatrefoil.git
         && git clone https://github.com/mvc-works/pointed-prompt.git
 
     - name: "compiles to js"
