@@ -151,12 +151,12 @@
                   state $ either (:data states)
                     {} $ :tab :portal
                   tab $ :tab state
-                  scaled 0.02
+                  scaled 0.002
                 scene ({})
                   group
                     {}
                       :scale $ [] scaled scaled scaled
-                      :position $ [] 0 -0.5 -1
+                      :position $ [] 0 1.1 -0.4
                     comp-lorenz-attractor $ >> states :lorenz
                     ambient-light $ {} (:color 0x666666)
                     ; point-light $ {} (:color 0xffffff) (:intensity 1.4) (:distance 200)

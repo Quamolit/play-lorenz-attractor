@@ -1206,7 +1206,7 @@
                       |t $ %{} :Expr (:at 1720032443120) (:by |-pxyJ-2j)
                         :data $ {}
                           |T $ %{} :Leaf (:at 1720032444464) (:by |-pxyJ-2j) (:text |scaled)
-                          |b $ %{} :Leaf (:at 1720032467618) (:by |-pxyJ-2j) (:text |0.02)
+                          |b $ %{} :Leaf (:at 1720116810401) (:by |-pxyJ-2j) (:text |0.002)
                   |T $ %{} :Expr (:at 1720032328462) (:by |-pxyJ-2j)
                     :data $ {}
                       |D $ %{} :Leaf (:at 1720032332815) (:by |-pxyJ-2j) (:text |scene)
@@ -1235,8 +1235,8 @@
                                     :data $ {}
                                       |T $ %{} :Leaf (:at 1720032458948) (:by |-pxyJ-2j) (:text |[])
                                       |b $ %{} :Leaf (:at 1720032459303) (:by |-pxyJ-2j) (:text |0)
-                                      |h $ %{} :Leaf (:at 1720032498535) (:by |-pxyJ-2j) (:text |-0.5)
-                                      |l $ %{} :Leaf (:at 1720032461532) (:by |-pxyJ-2j) (:text |-1)
+                                      |h $ %{} :Leaf (:at 1720116787019) (:by |-pxyJ-2j) (:text |1.1)
+                                      |l $ %{} :Leaf (:at 1720116820598) (:by |-pxyJ-2j) (:text |-0.4)
                           |r $ %{} :Expr (:at 1634457623796) (:by |-pxyJ-2j)
                             :data $ {}
                               |T $ %{} :Leaf (:at 1634457623796) (:by |-pxyJ-2j) (:text |comp-lorenz-attractor)
